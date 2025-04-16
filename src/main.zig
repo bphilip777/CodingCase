@@ -188,7 +188,7 @@ pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]u8 {
     return new_word;
 }
 
-fn words2Snake(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2Snake(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len +% 1;
@@ -202,7 +202,7 @@ fn words2Snake(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
     return new_word;
 }
 
-fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len +% 1;
@@ -220,7 +220,7 @@ fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]
     return new_word;
 }
 
-fn words2Kebab(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2Kebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len +% 1;
@@ -234,7 +234,7 @@ fn words2Kebab(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
     return new_word;
 }
 
-fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len +% 1;
@@ -252,7 +252,7 @@ fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]
     return new_word;
 }
 
-fn words2Pascal(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2Pascal(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len;
@@ -266,7 +266,7 @@ fn words2Pascal(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
     return new_word;
 }
 
-fn words2Camel(allo: std.mem.Allocator, words: std.ArrayList([]u8)) ![]u8 {
+fn words2Camel(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     var n_letters: usize = 0;
     for (words.items) |word| n_letters +%= word.len;
     var new_word = try allo.alloc(u8, n_letters);
