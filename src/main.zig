@@ -8,8 +8,8 @@ pub const CaseErrors = error{
 
 pub fn whichCase(text: []const u8) CaseErrors!Case {
     for (comptime std.meta.fieldNames(Case)) |name| {
-        const case = std.meta.stringToEnum(Case, name);
-        if (isCase(text, case)) return case;
+        const case_name = std.meta.stringToEnum(Case, name);
+        if (isCase(text, case_name)) |case| return case;
     } else return CaseErrors.InputDoesNotMatchAnyCase;
 }
 
