@@ -1,9 +1,5 @@
 const std = @import("std");
 
-// Very poorly coded
-// other way to solve this problem is too split words based on the case, recombine words based on case,
-// no need to actually split word but just record start/end or just ends of splits
-// then call split case, form case = less combinations -> 6^2 + 6 fns becomes 3*6 fns, still x2 for allo, buf
 pub const CaseErrors = error{
     IncorrectCase,
     OutputMemoryTooSmall,
