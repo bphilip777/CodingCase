@@ -15,16 +15,16 @@ pub fn whichCase(text: []const u8) CaseErrors!Case {
 
 pub fn isCase(text: []const u8, case: Case) bool {
     return switch (case) {
-        .snake => isSnakeCase(text),
-        .screaming_snake => isScreamingSnakeCase(text),
-        .kebab => isKebabCase(text),
-        .screaming_kebab => isScreamingKebabCase(text),
-        .pascal => isPascalCase(text),
-        .camel => isCamelCase(text),
+        .snake => isSnake(text),
+        .screaming_snake => isScreamingSnake(text),
+        .kebab => isKebab(text),
+        .screaming_kebab => isScreamingKebab(text),
+        .pascal => isPascal(text),
+        .camel => isCamel(text),
     };
 }
 
-fn isScreamingSnakeCase(text: []const u8) bool {
+fn isScreamingSnake(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isUpper(text[0])) return false;
     var has_snake: bool = false;
@@ -41,7 +41,7 @@ fn isScreamingSnakeCase(text: []const u8) bool {
     return has_snake and text[text.len -% 1] != '_';
 }
 
-fn isSnakeCase(text: []const u8) bool {
+fn isSnake(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isLower(text[0])) return false;
     var has_snake: bool = false;
@@ -58,7 +58,7 @@ fn isSnakeCase(text: []const u8) bool {
     return has_snake and text[text.len -% 1] != '_';
 }
 
-fn isScreamingKebabCase(text: []const u8) bool {
+fn isScreamingKebab(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isUpper(text[0])) return false;
     var has_kebabs: bool = false;
@@ -75,7 +75,7 @@ fn isScreamingKebabCase(text: []const u8) bool {
     return has_kebabs and text[text.len -% 1] != '-';
 }
 
-fn isKebabCase(text: []const u8) bool {
+fn isKebab(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isLower(text[0])) return false;
     var has_kebabs: bool = false;
@@ -92,7 +92,7 @@ fn isKebabCase(text: []const u8) bool {
     return has_kebabs and text[text.len -% 1] != '-';
 }
 
-pub fn isPascalCase(text: []const u8) bool {
+pub fn isPascal(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isUpper(text[0])) return false;
     if (text.len == 1) return true;
@@ -104,7 +104,7 @@ pub fn isPascalCase(text: []const u8) bool {
     } else return true;
 }
 
-fn isCamelCase(text: []const u8) bool {
+fn isCamel(text: []const u8) bool {
     if (text.len == 0) return false;
     if (!std.ascii.isLower(text[0])) return false;
     if (text.len == 1) return true;
@@ -177,7 +177,7 @@ pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]const u8
     const words = try split2Words(allo, input);
     defer words.deinit();
     defer for (words.items) |word| allo.free(word);
-    const new_word = try switch (input_case) {
+    const new_word = try switch (to) {
         .snake => words2Snake(allo, words),
         .screaming_snake => words2ScreamingSnake(allo, words),
         .kebab => words2Kebab(allo, words),
@@ -191,13 +191,20 @@ pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]const u8
 fn words2Snake(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
-    for (words.items) |word| n_letters +%= word.len +% 1;
+    for (words.items[0 .. words.items.len -% 1]) |word| {
+        n_letters +%= word.len +% 1;
+    } else {
+        n_letters +%= words.items[words.items.len -% 1].len;
+    }
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
-    for (words.items) |word| {
+    for (words.items[0 .. words.items.len -% 1]) |word| {
         @memcpy(new_word[idx .. idx +% word.len], word);
-        new_word[idx +% word.len +% 1] = '_';
+        new_word[idx +% word.len] = '_';
         idx +%= word.len +% 1;
+    } else {
+        const word = words.items[words.items.len -% 1];
+        @memcpy(new_word[idx .. idx +% word.len], word);
     }
     return new_word;
 }
@@ -205,14 +212,18 @@ fn words2Snake(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]con
 fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
-    for (words.items) |word| n_letters +%= word.len +% 1;
+    for (words.items[0 .. words.items.len -% 1]) |word| {
+        n_letters +%= word.len +% 1;
+    } else {
+        n_letters +%= words.items[words.items.len -% 1].len;
+    }
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
     for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
             new_word[idx +% i] = std.ascii.toUpper(ch);
         }
-        new_word[idx +% word.len +% 1] = '_';
+        new_word[idx +% word.len] = '_';
         idx +%= word.len +% 1;
     } else {
         const word = words.items[words.items.len - 1];
@@ -226,13 +237,20 @@ fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]const u8
 fn words2Kebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
-    for (words.items) |word| n_letters +%= word.len +% 1;
+    for (words.items[0 .. words.items.len -% 1]) |word| {
+        n_letters +%= word.len +% 1;
+    } else {
+        n_letters +%= words.items[words.items.len -% 1].len;
+    }
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
-    for (words.items) |word| {
+    for (words.items[0 .. words.items.len -% 1]) |word| {
         @memcpy(new_word[idx .. idx +% word.len], word);
-        new_word[idx +% word.len +% 1] = '-';
+        new_word[idx +% word.len] = '-';
         idx +%= word.len +% 1;
+    } else {
+        const word = words.items[words.items.len -% 1];
+        @memcpy(new_word[idx .. idx +% word.len], word);
     }
     return new_word;
 }
@@ -240,14 +258,18 @@ fn words2Kebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]con
 fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![]const u8 {
     if (words.items.len == 0) unreachable;
     var n_letters: usize = 0;
-    for (words.items) |word| n_letters +%= word.len +% 1;
+    for (words.items[0 .. words.items.len -% 1]) |word| {
+        n_letters +%= word.len +% 1;
+    } else {
+        n_letters +%= words.items[words.items.len -% 1].len;
+    }
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
     for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
             new_word[idx +% i] = std.ascii.toUpper(ch);
         }
-        new_word[idx +% word.len +% 1] = '-';
+        new_word[idx +% word.len] = '-';
         idx +%= word.len +% 1;
     } else {
         const word = words.items[words.items.len -% 1];
@@ -294,3 +316,50 @@ pub const Case = enum(u8) {
     pascal,
     camel,
 };
+
+test "Which Case" {
+    const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
+    const expected_cases = [_]Case{ .camel, .pascal, .kebab, .screaming_kebab, .snake, .screaming_snake };
+    for (base_inputs, expected_cases) |base_input, expected_case| {
+        const actual_case = try whichCase(base_input);
+        try std.testing.expectEqual(actual_case, expected_case);
+    }
+}
+
+test "Is Case" {
+    const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
+    const expected_comparisons = [_]bool{ true, false, false, false, false, false };
+    for (base_inputs, expected_comparisons) |base_input, expected_comparison| {
+        const actual_comparison = isCase(base_input, .camel);
+        try std.testing.expect(actual_comparison == expected_comparison);
+    }
+}
+
+test "Split 2 Words" {
+    const expected_words = [_][]const u8{ "hello", "world" };
+
+    const allo = std.testing.allocator;
+    const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
+    for (base_inputs) |base_input| {
+        const words = try split2Words(allo, base_input);
+        defer words.deinit();
+        defer for (words.items) |word| allo.free(word);
+
+        for (words.items, expected_words) |word, expected_word| {
+            try std.testing.expectEqualStrings(word, expected_word);
+        }
+    }
+}
+
+test "Convert" {
+    const allo = std.testing.allocator;
+    const base_input = "HelloWorld";
+    const expected_cases = [_]Case{ .camel, .pascal, .screaming_kebab, .kebab, .screaming_snake, .snake };
+    const expected_outputs = [_][]const u8{ "helloWorld", "HelloWorld", "HELLO-WORLD", "hello-world", "HELLO_WORLD", "hello_world" };
+
+    for (expected_cases, expected_outputs) |expected_case, expected_output| {
+        const new_input = try convert(allo, base_input, expected_case);
+        defer allo.free(new_input);
+        try std.testing.expectEqualStrings(new_input, expected_output);
+    }
+}
