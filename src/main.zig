@@ -170,7 +170,7 @@ fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]cons
     return words;
 }
 
-pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]u8 {
+pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]const u8 {
     if (input.len == 0) unreachable;
     const input_case = try whichCase(input);
     if (@intFromEnum(input_case) == @intFromEnum(to)) return try allo.dupe(u8, input);
