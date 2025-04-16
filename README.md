@@ -23,7 +23,7 @@ Example Use Case:
 ```zig
 const std = @import("std");
 const cc = @import("CodingCase");
-pub fn main() void {
+pub fn main() !void {
   const a = "HelloWorld";
   const da = std.heap.DebugAllocator(.{}){};
   const allo = da.allocator();
