@@ -151,8 +151,7 @@ fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]cons
                 try words.append(new_word);
             }
         },
-        .snake, .screaming_snake => {},
-        else => {
+        .snake, .screaming_snake => {
             var start: u32 = 0;
             var end: u32 = 0;
             for (input, 0..) |ch, i| {
