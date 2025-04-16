@@ -208,12 +208,17 @@ fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]const u8
     for (words.items) |word| n_letters +%= word.len +% 1;
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
-    for (words.items) |word| {
+    for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
             new_word[idx +% i] = std.ascii.toUpper(ch);
         }
         new_word[idx +% word.len +% 1] = '_';
         idx +%= word.len +% 1;
+    } else {
+        const word = words.items[words.items.len - 1];
+        for (word, 0..) |ch, i| {
+            new_word[idx +% i] = std.ascii.toUpper(ch);
+        }
     }
     return new_word;
 }
@@ -238,12 +243,17 @@ fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8
     for (words.items) |word| n_letters +%= word.len +% 1;
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
-    for (words.items) |word| {
+    for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
             new_word[idx +% i] = std.ascii.toUpper(ch);
         }
         new_word[idx +% word.len +% 1] = '-';
         idx +%= word.len +% 1;
+    } else {
+        const word = words.items[words.items.len -% 1];
+        for (word, 0..) |ch, i| {
+            new_word[idx +% i] = std.ascii.toUpper(ch);
+        }
     }
     return new_word;
 }
