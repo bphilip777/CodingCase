@@ -131,7 +131,7 @@ fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]cons
                     start = end;
                 }
             } else {
-                end = input.len;
+                end = @truncate(input.len);
                 const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
@@ -146,7 +146,7 @@ fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]cons
                 try words.append(new_word);
                 start = end +% 1;
             } else {
-                end = input.len;
+                end = @truncate(input.len);
                 const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
@@ -161,7 +161,7 @@ fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]cons
                 try words.append(new_word);
                 start = end +% 1;
             } else {
-                end = input.len;
+                end = @truncate(input.len);
                 const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
