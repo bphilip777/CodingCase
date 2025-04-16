@@ -209,11 +209,9 @@ fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]const u8
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
     for (words.items) |word| {
-        var i: usize = 0;
-        while (i < word.len) : (i +%= 1) {
-            word[i] = std.ascii.toUpper(word[i]);
+        for (word, 0..) |ch, i| {
+            new_word[idx +% i] = std.ascii.toUpper(ch);
         }
-        @memcpy(new_word[idx .. idx +% word.len], word);
         new_word[idx +% word.len +% 1] = '_';
         idx +%= word.len +% 1;
     }
@@ -241,11 +239,9 @@ fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]const u8
     var new_word = try allo.alloc(u8, n_letters);
     var idx: usize = 0;
     for (words.items) |word| {
-        var i: usize = 0;
-        while (i < word.len) : (i +%= 1) {
-            word[i] = std.ascii.toUpper(word[i]);
+        for (word, 0..) |ch, i| {
+            new_word[idx +% i] = std.ascii.toUpper(ch);
         }
-        @memcpy(new_word[idx .. idx +% word.len], word);
         new_word[idx +% word.len +% 1] = '-';
         idx +%= word.len +% 1;
     }
