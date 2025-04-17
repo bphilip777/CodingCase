@@ -328,10 +328,11 @@ test "Which Case" {
 
 test "Is Case" {
     const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
-    const expected_comparisons = [_]bool{ true, false, false, false, false, false };
-    for (base_inputs, expected_comparisons) |base_input, expected_comparison| {
-        const actual_comparison = isCase(base_input, .camel);
-        try std.testing.expect(actual_comparison == expected_comparison);
+    const base_inputs2 = [_][]const u8{ "hello2World", "Hello2World", "hello-2-world", "HELLO-2-WORLD", "hello_2_world", "HELLO_2_WORLD" };
+    const expected_comparisons = [_]Case{ .camel, .pascal, .kebab, .screaming_kebab, .snake, .screaming_snake };
+    for (base_inputs, base_inputs2, expected_comparisons) |bi, bi2, expected_case| {
+        try std.testing.expect(isCase(bi, expected_case));
+        try std.testing.expect(isCase(bi2, expected_case));
     }
 }
 
