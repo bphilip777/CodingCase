@@ -116,7 +116,7 @@ fn isCamel(text: []const u8) bool {
     } else return true;
 }
 
-fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]const u8) {
+pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]const u8) {
     const input_case = try whichCase(input);
     var words = std.ArrayList([]const u8).init(allo);
     switch (input_case) {
