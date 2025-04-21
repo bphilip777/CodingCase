@@ -1,5 +1,12 @@
 const std = @import("std");
 
+const isAlphabetic = std.ascii.isAlphabetic;
+const toUpper = std.ascii.toUpper;
+const isUpper = std.ascii.isUpper;
+const isLower = std.ascii.isLower;
+const isDigit = std.ascii.isDigit;
+const allocLowerString = std.ascii.allocLowerString;
+
 pub const CaseErrors = error{
     IncorrectCase,
     OutputMemoryTooSmall,
@@ -26,7 +33,7 @@ pub fn isCase(text: []const u8, case: Case) bool {
 
 fn isScreamingSnake(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isUpper(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isUpper(text[0])) return false;
     var has_snake: bool = false;
     for (text) |ch| {
         switch (ch) {
@@ -43,7 +50,7 @@ fn isScreamingSnake(text: []const u8) bool {
 
 fn isSnake(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isLower(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
     var has_snake: bool = false;
     for (text) |ch| {
         switch (ch) {
@@ -60,7 +67,7 @@ fn isSnake(text: []const u8) bool {
 
 fn isScreamingKebab(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isUpper(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isUpper(text[0])) return false;
     var has_kebabs: bool = false;
     for (text) |ch| {
         switch (ch) {
@@ -77,7 +84,7 @@ fn isScreamingKebab(text: []const u8) bool {
 
 fn isKebab(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isLower(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
     var has_kebabs: bool = false;
     for (text) |ch| {
         switch (ch) {
@@ -94,7 +101,7 @@ fn isKebab(text: []const u8) bool {
 
 pub fn isPascal(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isUpper(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isUpper(text[0])) return false;
     if (text.len == 1) return true;
     for (text[1..text.len]) |ch| {
         switch (ch) {
@@ -106,7 +113,7 @@ pub fn isPascal(text: []const u8) bool {
 
 fn isCamel(text: []const u8) bool {
     if (text.len == 0) return false;
-    if (!std.ascii.isLower(text[0])) return false;
+    if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
     if (text.len == 1) return true;
     for (text[1..text.len]) |ch| {
         switch (ch) {
@@ -124,15 +131,15 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
             var start: u32 = 0;
             var end: u32 = 0;
             for (input[0 .. input.len - 1], input[1..input.len], 0..) |ch1, ch2, i| {
-                if ((std.ascii.isLower(ch1) or std.ascii.isDigit(ch1)) and std.ascii.isUpper(ch2)) {
+                if ((isLower(ch1) or isDigit(ch1)) and isUpper(ch2)) {
                     end = @truncate(i +% 1);
-                    const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                    const new_word = try allocLowerString(allo, input[start..end]);
                     try words.append(new_word);
                     start = end;
                 }
             } else {
                 end = @truncate(input.len);
-                const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                const new_word = try allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
         },
@@ -142,12 +149,12 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
             for (input, 0..) |ch, i| {
                 if (ch != '-') continue;
                 end = @truncate(i);
-                const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                const new_word = try allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
                 start = end +% 1;
             } else {
                 end = @truncate(input.len);
-                const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                const new_word = try allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
         },
@@ -157,12 +164,12 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
             for (input, 0..) |ch, i| {
                 if (ch != '_') continue;
                 end = @truncate(i);
-                const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                const new_word = try allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
                 start = end +% 1;
             } else {
                 end = @truncate(input.len);
-                const new_word = try std.ascii.allocLowerString(allo, input[start..end]);
+                const new_word = try allocLowerString(allo, input[start..end]);
                 try words.append(new_word);
             }
         },
@@ -221,14 +228,14 @@ pub fn words2ScreamingSnake(allo: std.mem.Allocator, words: std.ArrayList([]cons
     var idx: usize = 0;
     for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
-            new_word[idx +% i] = std.ascii.toUpper(ch);
+            new_word[idx +% i] = toUpper(ch);
         }
         new_word[idx +% word.len] = '_';
         idx +%= word.len +% 1;
     } else {
         const word = words.items[words.items.len - 1];
         for (word, 0..) |ch, i| {
-            new_word[idx +% i] = std.ascii.toUpper(ch);
+            new_word[idx +% i] = toUpper(ch);
         }
     }
     return new_word;
@@ -267,14 +274,14 @@ pub fn words2ScreamingKebab(allo: std.mem.Allocator, words: std.ArrayList([]cons
     var idx: usize = 0;
     for (words.items[0 .. words.items.len -% 1]) |word| {
         for (word, 0..) |ch, i| {
-            new_word[idx +% i] = std.ascii.toUpper(ch);
+            new_word[idx +% i] = toUpper(ch);
         }
         new_word[idx +% word.len] = '-';
         idx +%= word.len +% 1;
     } else {
         const word = words.items[words.items.len -% 1];
         for (word, 0..) |ch, i| {
-            new_word[idx +% i] = std.ascii.toUpper(ch);
+            new_word[idx +% i] = toUpper(ch);
         }
     }
     return new_word;
@@ -288,7 +295,7 @@ pub fn words2Pascal(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) !
     var idx: usize = 0;
     for (words.items) |word| {
         @memcpy(new_word[idx .. idx +% word.len], word);
-        new_word[idx] = std.ascii.toUpper(new_word[idx]);
+        new_word[idx] = toUpper(new_word[idx]);
         idx +%= word.len;
     }
     return new_word;
@@ -302,7 +309,7 @@ pub fn words2Camel(allo: std.mem.Allocator, words: std.ArrayList([]const u8)) ![
     var idx: usize = words.items[0].len;
     for (words.items[1..words.items.len]) |word| {
         @memcpy(new_word[idx .. idx +% word.len], word);
-        new_word[idx] = std.ascii.toUpper(new_word[idx]);
+        new_word[idx] = toUpper(new_word[idx]);
         idx +%= word.len;
     }
     return new_word;
@@ -329,10 +336,12 @@ test "Which Case" {
 test "Is Case" {
     const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
     const base_inputs2 = [_][]const u8{ "hello2World", "Hello2World", "hello-2-world", "HELLO-2-WORLD", "hello_2_world", "HELLO_2_WORLD" };
+    const base_inputs3 = [_][]const u8{ "2helloWorld", "2HelloWorld", "2-hello-world", "2-HELLO-WORLD", "2_hello_world", "2_HELLO_WORLD" };
     const expected_comparisons = [_]Case{ .camel, .pascal, .kebab, .screaming_kebab, .snake, .screaming_snake };
-    for (base_inputs, base_inputs2, expected_comparisons) |bi, bi2, expected_case| {
+    for (base_inputs, base_inputs2, base_inputs3, expected_comparisons) |bi, bi2, bi3, expected_case| {
         try std.testing.expect(isCase(bi, expected_case));
         try std.testing.expect(isCase(bi2, expected_case));
+        try std.testing.expect(isCase(bi3, expected_case));
     }
 }
 
