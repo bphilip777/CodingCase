@@ -34,69 +34,49 @@ pub fn isCase(text: []const u8, case: Case) bool {
 fn isScreamingSnake(text: []const u8) bool {
     if (text.len == 0) return false;
     if (isAlphabetic(text[0]) and !isUpper(text[0])) return false;
-    var has_snake: bool = false;
     for (text) |ch| {
         switch (ch) {
-            '_' => {
-                has_snake = true;
-                continue;
-            },
-            'A'...'Z', '0'...'9' => continue,
+            'A'...'Z', '0'...'9', '_' => continue,
             else => return false,
         }
     }
-    return has_snake and text[text.len -% 1] != '_';
+    return true;
 }
 
 fn isSnake(text: []const u8) bool {
     if (text.len == 0) return false;
     if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
-    var has_snake: bool = false;
     for (text) |ch| {
         switch (ch) {
-            '_' => {
-                has_snake = true;
-                continue;
-            },
             'a'...'z', '0'...'9' => continue,
             else => return false,
         }
     }
-    return has_snake and text[text.len -% 1] != '_';
+    return true;
 }
 
 fn isScreamingKebab(text: []const u8) bool {
     if (text.len == 0) return false;
     if (isAlphabetic(text[0]) and !isUpper(text[0])) return false;
-    var has_kebabs: bool = false;
     for (text) |ch| {
         switch (ch) {
-            '-' => {
-                has_kebabs = true;
-                continue;
-            },
-            'A'...'Z', '0'...'9' => continue,
+            'A'...'Z', '0'...'9', '-' => continue,
             else => return false,
         }
     }
-    return has_kebabs and text[text.len -% 1] != '-';
+    return true;
 }
 
 fn isKebab(text: []const u8) bool {
     if (text.len == 0) return false;
     if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
-    var has_kebabs: bool = false;
     for (text) |ch| {
         switch (ch) {
-            '-' => {
-                has_kebabs = true;
-                continue;
-            },
-            'a'...'z', '0'...'9' => continue,
+            'a'...'z', '0'...'9', '-' => continue,
             else => return false,
         }
     }
-    return has_kebabs and text[text.len -% 1] != '-';
+    return true;
 }
 
 pub fn isPascal(text: []const u8) bool {
@@ -337,11 +317,13 @@ test "Is Case" {
     const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
     const base_inputs2 = [_][]const u8{ "hello2World", "Hello2World", "hello-2-world", "HELLO-2-WORLD", "hello_2_world", "HELLO_2_WORLD" };
     const base_inputs3 = [_][]const u8{ "2helloWorld", "2HelloWorld", "2-hello-world", "2-HELLO-WORLD", "2_hello_world", "2_HELLO_WORLD" };
+    const base_inputs4 = [_][]const u8{ "hello", "Hello", "hello", "HELLO", "hell", "HELLO" };
     const expected_comparisons = [_]Case{ .camel, .pascal, .kebab, .screaming_kebab, .snake, .screaming_snake };
-    for (base_inputs, base_inputs2, base_inputs3, expected_comparisons) |bi, bi2, bi3, expected_case| {
+    for (base_inputs, base_inputs2, base_inputs3, base_inputs4, expected_comparisons) |bi, bi2, bi3, bi4, expected_case| {
         try std.testing.expect(isCase(bi, expected_case));
         try std.testing.expect(isCase(bi2, expected_case));
         try std.testing.expect(isCase(bi3, expected_case));
+        try std.testing.expect(isCase(bi4, expected_case));
     }
 }
 
