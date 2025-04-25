@@ -1,4 +1,6 @@
 const std = @import("std");
+const log = std.log;
+const Indexer = std.enums.EnumIndexer;
 
 const isAlphabetic = std.ascii.isAlphabetic;
 const toUpper = std.ascii.toUpper;
@@ -14,10 +16,14 @@ pub const CaseErrors = error{
 };
 
 pub fn whichCase(text: []const u8) CaseErrors!Case {
-    for (comptime std.meta.fieldNames(Case)) |name| {
-        const case = std.meta.stringToEnum(Case, name).?;
+    const indexer = Indexer(Case);
+    for (0..indexer.count) |i| {
+        const case = indexer.keyForIndex(i);
         if (isCase(text, case)) return case;
-    } else return CaseErrors.InputDoesNotMatchAnyCase;
+    } else {
+        log.err("Could Not Identify: {s}", .{text});
+        return CaseErrors.InputDoesNotMatchAnyCase;
+    }
 }
 
 pub fn isCase(text: []const u8, case: Case) bool {
@@ -48,7 +54,7 @@ fn isSnake(text: []const u8) bool {
     if (isAlphabetic(text[0]) and !isLower(text[0])) return false;
     for (text) |ch| {
         switch (ch) {
-            'a'...'z', '0'...'9' => continue,
+            'a'...'z', '0'...'9', '_' => continue,
             else => return false,
         }
     }
