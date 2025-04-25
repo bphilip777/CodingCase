@@ -1,8 +1,8 @@
 const std = @import("std");
+const builtin = @import("builtin");
+const is_debug_mode = builtin.mode == .Debug;
 const log = std.log;
 const Indexer = std.enums.EnumIndexer;
-
-// Edge Case w/ WhichCase - ambiguity on type of return when text contains a single word w/ no delimiters
 
 const isAlphabetic = std.ascii.isAlphabetic;
 const toUpper = std.ascii.toUpper;
@@ -17,13 +17,14 @@ pub const CaseErrors = error{
     InputDoesNotMatchAnyCase,
 };
 
+// Edge Case w/ WhichCase - ambiguity on type of return when text contains a single word w/ no delimiters
 pub fn whichCase(text: []const u8) CaseErrors!Case {
     const indexer = Indexer(Case);
     for (0..indexer.count) |i| {
         const case = indexer.keyForIndex(i);
         if (isCase(text, case)) return case;
     } else {
-        log.err("Could Not Identify: {s}", .{text});
+        if (is_debug_mode) log.err("Could Not Identify: {s}", .{text});
         return CaseErrors.InputDoesNotMatchAnyCase;
     }
 }
