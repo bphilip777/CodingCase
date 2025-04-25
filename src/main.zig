@@ -2,6 +2,8 @@ const std = @import("std");
 const log = std.log;
 const Indexer = std.enums.EnumIndexer;
 
+// Edge Case w/ WhichCase - ambiguity on type of return when text contains a single word w/ no delimiters
+
 const isAlphabetic = std.ascii.isAlphabetic;
 const toUpper = std.ascii.toUpper;
 const isUpper = std.ascii.isUpper;
