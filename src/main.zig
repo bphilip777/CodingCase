@@ -114,7 +114,7 @@ fn isCamel(text: []const u8) bool {
 
 pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]const u8) {
     const input_case = try whichCase(input);
-    var words = std.ArrayList([]const u8).init(allo);
+    var words = try std.ArrayList([]const u8).initCapacity(allo, 8);
     switch (input_case) {
         .camel, .pascal => {
             var start: u32 = 0;
@@ -123,13 +123,13 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
                 if ((isLower(ch1) or isDigit(ch1)) and isUpper(ch2)) {
                     end = @truncate(i +% 1);
                     const new_word = try allocLowerString(allo, input[start..end]);
-                    try words.append(new_word);
+                    try words.append(allo, new_word);
                     start = end;
                 }
             } else {
                 end = @truncate(input.len);
                 const new_word = try allocLowerString(allo, input[start..end]);
-                try words.append(new_word);
+                try words.append(allo, new_word);
             }
         },
         .kebab, .screaming_kebab => {
@@ -139,12 +139,12 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
                 if (ch != '-') continue;
                 end = @truncate(i);
                 const new_word = try allocLowerString(allo, input[start..end]);
-                try words.append(new_word);
+                try words.append(allo, new_word);
                 start = end +% 1;
             } else {
                 end = @truncate(input.len);
                 const new_word = try allocLowerString(allo, input[start..end]);
-                try words.append(new_word);
+                try words.append(allo, new_word);
             }
         },
         .snake, .screaming_snake => {
@@ -154,12 +154,12 @@ pub fn split2Words(allo: std.mem.Allocator, input: []const u8) !std.ArrayList([]
                 if (ch != '_') continue;
                 end = @truncate(i);
                 const new_word = try allocLowerString(allo, input[start..end]);
-                try words.append(new_word);
+                try words.append(allo, new_word);
                 start = end +% 1;
             } else {
                 end = @truncate(input.len);
                 const new_word = try allocLowerString(allo, input[start..end]);
-                try words.append(new_word);
+                try words.append(allo, new_word);
             }
         },
     }
@@ -170,8 +170,8 @@ pub fn convert(allo: std.mem.Allocator, input: []const u8, to: Case) ![]const u8
     if (input.len == 0) unreachable;
     const input_case = try whichCase(input);
     if (@intFromEnum(input_case) == @intFromEnum(to)) return try allo.dupe(u8, input);
-    const words = try split2Words(allo, input);
-    defer words.deinit();
+    var words = try split2Words(allo, input);
+    defer words.deinit(allo);
     defer for (words.items) |word| allo.free(word);
     const new_word = try switch (to) {
         .snake => words2Snake(allo, words),
@@ -342,8 +342,8 @@ test "Split 2 Words" {
     const allo = std.testing.allocator;
     const base_inputs = [_][]const u8{ "helloWorld", "HelloWorld", "hello-world", "HELLO-WORLD", "hello_world", "HELLO_WORLD" };
     for (base_inputs) |base_input| {
-        const words = try split2Words(allo, base_input);
-        defer words.deinit();
+        var words = try split2Words(allo, base_input);
+        defer words.deinit(allo);
         defer for (words.items) |word| allo.free(word);
 
         for (words.items, expected_words) |word, expected_word| {
